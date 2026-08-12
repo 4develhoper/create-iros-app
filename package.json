@@ -1,0 +1,17 @@
+{
+  "name": "create-iros-app",
+  "version": "1.0.0",
+  "description": "Crée un projet Next.js à partir du boilerplate Iros.",
+  "type": "module",
+  "license": "MIT",
+  "bin": { "create-iros-app": "./index.mjs" },
+  "files": ["index.mjs", "README.md"],
+  "engines": { "node": ">=20" },
+  "keywords": ["iros", "nextjs", "boilerplate", "starter"],
+  "repository": { "type": "git", "url": "git+https://github.com/4develhoper/create-iros-app.git" },
+  "dependencies": {
+    "giget": "^2.0.0",
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2"
+  }
+}
