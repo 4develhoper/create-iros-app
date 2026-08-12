@@ -1,0 +1,20 @@
+# Dépendances
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Artefacts de publication npm
+*.tgz
+
+# Variables d'environnement
+.env*
+
+# Éditeurs et OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/
