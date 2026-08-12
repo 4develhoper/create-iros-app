@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -7,7 +9,7 @@ import pc from "picocolors";
 import prompts from "prompts";
 
 /** Source du template. Épingler un tag évite de livrer un `main` instable. */
-const TEMPLATE = process.env.IROS_TEMPLATE ?? "github:4develhoper/iros#v1.0.1";
+const TEMPLATE = process.env.IROS_TEMPLATE ?? "github:4develhoper/iros#v1.0.2";
 
 /** Port de développement par défaut du boilerplate. */
 const PORT = 3017;
