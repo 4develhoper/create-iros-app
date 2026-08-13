@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/** @format */
 
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
@@ -75,7 +76,7 @@ const collectAnswers = async (options) => {
       },
       { type: "text", name: "description", message: "Description", initial: "" },
     ],
-    { onCancel: () => process.exit(1) },
+    { onCancel: () => process.exit(1) }
   );
 };
 
@@ -117,14 +118,17 @@ const main = async () => {
 
   const directory = options.dir ?? answers.dir;
   const target = resolve(process.cwd(), directory);
-  const packageName = basename(target).toLowerCase().replace(/[^a-z0-9-~][^a-z0-9-._~]*/g, "-");
+  const packageName = basename(target)
+    .toLowerCase()
+    .replace(/[^a-z0-9-~][^a-z0-9-._~]*/g, "-");
 
   if (existsSync(target) && readdirSync(target).length > 0) {
     console.error(pc.red(`Le dossier ${directory} existe déjà et n'est pas vide.`));
     process.exit(1);
   }
 
-  console.log(pc.dim(`\nTéléchargement du template depuis ${TEMPLATE}…`));
+  console.log(pc.dim(`\nTéléchargement du template...`));
+  // console.log(pc.dim(`\nTéléchargement du template depuis ${TEMPLATE}…`));
   await downloadTemplate(TEMPLATE, { dir: target, force: true });
 
   // 1. package.json : nom du projet, version remise à zéro.
@@ -139,10 +143,7 @@ const main = async () => {
   replaceInFile(join(target, "src/config/site.config.ts"), [
     [/name: "Boilerplate"/, `name: ${JSON.stringify(answers.displayName)}`],
     [/shortName: "Boilerplate\."/, `shortName: ${JSON.stringify(`${answers.displayName}.`)}`],
-    [
-      /description:\s*\n?\s*"[^"]*"/,
-      `description: ${JSON.stringify(answers.description || `${answers.displayName}, propulsé par Iros.`)}`,
-    ],
+    [/description:\s*\n?\s*"[^"]*"/, `description: ${JSON.stringify(answers.description || `${answers.displayName}, propulsé par Iros.`)}`],
   ]);
 
   // 3. .env : secret d'authentification généré, URL alignées sur le port réel.
