@@ -9,10 +9,13 @@ import pc from "picocolors";
 import prompts from "prompts";
 
 /** Source du template. Épingler un tag évite de livrer un `main` instable. */
-const TEMPLATE = process.env.IROS_TEMPLATE ?? "github:4develhoper/iros#v1.0.2";
+const TEMPLATE = process.env.IROS_TEMPLATE ?? "github:4develhoper/iros#v1.0.3";
 
 /** Port de développement par défaut du boilerplate. */
 const PORT = 3017;
+
+/** Dossier retenu lorsque la ligne de commande n'en nomme aucun. */
+const DEFAULT_DIR = "mon-app";
 
 /**
  * Analyse minimale de la ligne de commande.
@@ -20,20 +23,60 @@ const PORT = 3017;
  * @example
  * ```bash
  * create-iros-app mon-app --pm bun --no-git
+ * create-iros-app mon-app --yes          # sans aucune question
  * ```
  */
 const parseArgv = (argv) => {
-  const options = { dir: undefined, install: true, git: true, pm: undefined };
+  const options = { dir: undefined, install: true, git: true, pm: undefined, yes: false };
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--no-install") options.install = false;
     else if (argument === "--no-git") options.git = false;
+    else if (argument === "--yes" || argument === "-y") options.yes = true;
     else if (argument === "--pm") options.pm = argv[++index];
     else if (!argument.startsWith("-")) options.dir ??= argument;
   }
 
   return options;
+};
+
+/** Déduit un nom affiché lisible depuis un nom de dossier. */
+const toDisplayName = (raw) =>
+  basename(raw)
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+
+/**
+ * Réunit les métadonnées du projet, en interrogeant l'utilisateur si besoin.
+ *
+ * `--yes` court-circuite les questions : c'est le seul mode utilisable sans
+ * terminal interactif, `prompts` s'interrompant sur une entrée redirigée.
+ */
+const collectAnswers = async (options) => {
+  if (options.yes) {
+    const dir = options.dir ?? DEFAULT_DIR;
+    return { dir, displayName: toDisplayName(dir), description: "" };
+  }
+
+  return prompts(
+    [
+      {
+        type: options.dir ? null : "text",
+        name: "dir",
+        message: "Nom du projet",
+        initial: DEFAULT_DIR,
+      },
+      {
+        type: "text",
+        name: "displayName",
+        message: "Nom affiché dans l'application",
+        initial: (_, values) => toDisplayName(options.dir ?? values.dir ?? DEFAULT_DIR),
+      },
+      { type: "text", name: "description", message: "Description", initial: "" },
+    ],
+    { onCancel: () => process.exit(1) },
+  );
 };
 
 /** Devine le gestionnaire de paquets depuis `npm_config_user_agent`. */
@@ -70,27 +113,7 @@ const replaceInFile = (path, replacements) => {
 const main = async () => {
   const options = parseArgv(process.argv.slice(2));
 
-  const answers = await prompts(
-    [
-      {
-        type: options.dir ? null : "text",
-        name: "dir",
-        message: "Nom du projet",
-        initial: "mon-app",
-      },
-      {
-        type: "text",
-        name: "displayName",
-        message: "Nom affiché dans l'application",
-        initial: (_, values) => {
-          const raw = options.dir ?? values.dir ?? "mon-app";
-          return basename(raw).replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-        },
-      },
-      { type: "text", name: "description", message: "Description", initial: "" },
-    ],
-    { onCancel: () => process.exit(1) },
-  );
+  const answers = await collectAnswers(options);
 
   const directory = options.dir ?? answers.dir;
   const target = resolve(process.cwd(), directory);

@@ -40,11 +40,12 @@ ligne de commande), le nom affiché dans l'interface, et la description.
 
 ## Options
 
-| Option         | Effet                                                                    |
-| -------------- | ------------------------------------------------------------------------ |
-| `--no-install` | N'installe rien et ne migre pas ; les commandes à lancer sont rappelées   |
-| `--no-git`     | Ne crée pas de dépôt Git                                                  |
-| `--pm <nom>`   | Force le gestionnaire : `bun`, `npm`, `pnpm` ou `yarn`                    |
+| Option           | Effet                                                                  |
+| ---------------- | ---------------------------------------------------------------------- |
+| `--yes`, `-y`    | Ne pose aucune question et retient les valeurs par défaut               |
+| `--no-install`   | N'installe rien et ne migre pas ; les commandes à lancer sont rappelées |
+| `--no-git`       | Ne crée pas de dépôt Git                                                |
+| `--pm <nom>`     | Force le gestionnaire : `bun`, `npm`, `pnpm` ou `yarn`                  |
 
 Sans `--pm`, le gestionnaire est déduit de la commande d'invocation
 (`npm_config_user_agent`). Le boilerplate épingle `bun@1.3.14` via
@@ -53,6 +54,20 @@ Sans `--pm`, le gestionnaire est déduit de la commande d'invocation
 ```bash
 bun create iros-app mon-projet --no-install --no-git
 ```
+
+### Mode non interactif
+
+`prompts` exige un terminal : sur une entrée redirigée, il s'interrompt sans
+rien créer. `--yes` est donc **le seul mode utilisable en CI**, dans un
+conteneur ou depuis un script.
+
+```bash
+bun create iros-app mon-projet --yes
+```
+
+Le nom affiché est alors dérivé du dossier (`mon-projet` → « Mon Projet ») et la
+description prend sa valeur par défaut. Sans dossier nommé, `mon-app` est
+retenu.
 
 ## Prérequis
 
