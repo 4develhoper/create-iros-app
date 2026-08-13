@@ -1,6 +1,6 @@
 {
   "name": "create-iros-app",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Crée un projet Next.js à partir du boilerplate Iros.",
   "type": "module",
   "license": "MIT",
