@@ -45,9 +45,18 @@ const detectPackageManager = () => {
   return "npm";
 };
 
-/** Exécute une commande dans le projet et interrompt le script en cas d'échec. */
+/**
+ * Exécute une commande dans le projet et interrompt le script en cas d'échec.
+ *
+ * Sous Windows, les gestionnaires de paquets sont des scripts `.cmd` que
+ * `spawnSync` ne sait lancer qu'à travers un shell. `git`, lui, est un
+ * exécutable natif : le passer par le shell casserait ses arguments, car
+ * `shell: true` concatène `args` sans échappement — un message de commit
+ * multi-mots serait alors découpé en autant de pathspecs.
+ */
 const run = (command, args, cwd) => {
-  const result = spawnSync(command, args, { cwd, stdio: "inherit", shell: process.platform === "win32" });
+  const shell = process.platform === "win32" && command !== "git";
+  const result = spawnSync(command, args, { cwd, stdio: "inherit", shell });
   if (result.status !== 0) throw new Error(`${command} ${args.join(" ")} a échoué.`);
 };
 
@@ -134,10 +143,16 @@ const main = async () => {
     run(packageManager, ["run", "db:migrate"], target);
   }
 
+  // Le dépôt Git est un confort, pas une condition de réussite : une identité
+  // Git absente ne doit pas condamner un projet par ailleurs opérationnel.
   if (options.git && !existsSync(join(target, ".git"))) {
-    run("git", ["init"], target);
-    run("git", ["add", "-A"], target);
-    run("git", ["commit", "-m", "chore: initialisation depuis create-iros-app"], target);
+    try {
+      run("git", ["init"], target);
+      run("git", ["add", "-A"], target);
+      run("git", ["commit", "-m", "chore: initialisation depuis create-iros-app"], target);
+    } catch {
+      console.warn(pc.yellow("\nDépôt Git non initialisé — à faire à la main si besoin."));
+    }
   }
 
   const runner = packageManager === "npm" ? "npm run" : packageManager === "yarn" ? "yarn" : `${packageManager} run`;
