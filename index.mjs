@@ -10,7 +10,7 @@ import pc from "picocolors";
 import prompts from "prompts";
 
 /** Source du template. Épingler un tag évite de livrer un `main` instable. */
-const TEMPLATE = process.env.IROS_TEMPLATE ?? "github:4develhoper/iros#v1.0.3";
+const TEMPLATE = process.env.IROS_TEMPLATE ?? "github:4develhoper/iros#v1.0.5";
 
 /** Port de développement par défaut du boilerplate. */
 const PORT = 3017;
